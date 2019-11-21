@@ -12,7 +12,25 @@ import threading
 import os
 import openpyxl
 import time
+import argparse 
 
+
+##########################################
+#       Command line argument 
+##########################################
+sim_time = 5
+
+if len(sys.argv) != 1:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('X', type=int, help="default simluation time is '5 sec'")
+    args = parser.parse_args()
+    sim_time = args.X
+
+
+
+##########################################
+#               Database 
+##########################################
 class DB_sending:
     def __init__(self):
         self.url = "210.115.227.108"
@@ -60,6 +78,10 @@ class DB_sending:
 dev_id = 0
 conn = DB_sending()
 
+
+##########################################
+#           Bluetooth scan 
+##########################################
 try:
     sock = bluez.hci_open_dev(dev_id)
     print("ble thread started")
@@ -71,6 +93,10 @@ except:
 blescan.hci_le_set_scan_parameters(sock)
 blescan.hci_enable_le_scan(sock)
 
+
+##########################################
+#           BLE EXCEL create
+##########################################
 start_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 
 wb = openpyxl.Workbook()
@@ -87,8 +113,12 @@ wb.save(start_time + '.xlsx')
 
 time_check = time.time()
 
+
+##########################################
+#       Beacon info check & EXCEL add
+##########################################
 while True:
-    if time.time() <= time_check+5:
+    if time.time() <= time_check + sim_time:
         #print 'working?'
         returnedList = blescan.parse_events(sock, 10)
         #print 'working?2'
