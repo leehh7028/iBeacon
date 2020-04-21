@@ -1,4 +1,3 @@
-# Last updated on: 2019-09-27
 
 #!/usr/bin/env python
 # test BLE Scanning software
@@ -18,13 +17,13 @@ import argparse
 ##########################################
 #       Command line argument 
 ##########################################
-sim_time = 5
-
-if len(sys.argv) != 1:
-    parser = argparse.ArgumentParser()
-    parser.add_argument('X', type=int, help="default simluation time is '5 sec'")
-    args = parser.parse_args()
-    sim_time = args.X
+#sim_time = 5
+#
+#if len(sys.argv) != 1:
+#    parser = argparse.ArgumentParser()
+#    parser.add_argument('X', type=int, help="default simluation time is '5 sec'")
+#    args = parser.parse_args()
+#    sim_time = args.X
 
 
 
@@ -37,6 +36,7 @@ class DB_sending:
         self.id = 'cic'
         self.password = '20180903in'
         self.dbName = 'kindergartenbus'
+
     def creat_connet(self):
         self.db = pymysql.connect(host=self.url, port=3306, user=self.id, passwd=self.password, db=self.dbName, charset='utf8')
         self.cursor = self.db.cursor()
@@ -97,38 +97,44 @@ blescan.hci_enable_le_scan(sock)
 ##########################################
 #           BLE EXCEL create
 ##########################################
-start_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-
-wb = openpyxl.Workbook()
-sheet1 = wb['Sheet']
-sheet1.title = 'Collected data'
-sheet1.cell(row=1, column=1).value = 'MAC'
-sheet1.cell(row=1, column=2).value = 'Major'
-sheet1.cell(row=1, column=3).value = 'Minor'
-sheet1.cell(row=1, column=4).value = 'RSSI'
-sheet1.cell(row=1, column=5).value = 'TX_power'
-sheet1.cell(row=1, column=6).value = 'Accuracy'
-sheet1.cell(row=1, column=7).value = 'yyyy-mm-dd h:m:s)'
-wb.save(start_time + '.xlsx')
-
-time_check = time.time()
+#start_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+#
+#wb = openpyxl.Workbook()
+#sheet1 = wb['Sheet']
+#sheet1.title = 'Collected data'
+#sheet1.cell(row=1, column=1).value = 'MAC'
+#sheet1.cell(row=1, column=2).value = 'Major'
+#sheet1.cell(row=1, column=3).value = 'Minor'
+#sheet1.cell(row=1, column=4).value = 'RSSI'
+#sheet1.cell(row=1, column=5).value = 'TX_power'
+#sheet1.cell(row=1, column=6).value = 'Accuracy'
+#sheet1.cell(row=1, column=7).value = 'yyyy-mm-dd h:m:s)'
+#wb.save(start_time + '.xlsx')
+#
+#time_check = time.time()
 
 
 ##########################################
 #       Beacon info check & EXCEL add
 ##########################################
 while True:
-    if time.time() <= time_check + sim_time:
+#    if time.time() <= time_check + sim_time:
         #print 'working?'
         returnedList = blescan.parse_events(sock, 10)
         #print 'working?2'
         for beacon in returnedList:
             print(beacon)
             beacon_split = beacon.split(',')
-            if beacon_split[2] in ["40001"]:
-                sheet1.append([beacon_split[0], beacon_split[2], beacon_split[3], beacon_split[5], beacon_split[4], conn.calcualte_distance_rssi(beacon_split[4],beacon_split[5]), time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))])
-                wb.save(start_time + '.xlsx')
-        print
-    else:
-        break
+            # [0] MAC, [1] UUID, [2] Major, [3] Minor, [4] RSSI, [5] Tx power
+#            if beacon_split[2] in ["40001"]:
+            if beacon_split[3] in ["30533"]:
+                conn.creat_connet()
+#                sheet1.append([beacon_split[0], beacon_split[2], beacon_split[3], beacon_split[5], beacon_split[4], conn.calcualte_distance_rssi(beacon_split[4],beacon_split[5]), time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))])
+                conn.insert_unique_data(beacon_split[0], beacon_split[1], beacon_split[2], beacon_split[3])
+                conn.insert_valiable_data(beacon_split[0], beacon_split[5], beacon_split[4], conn.calcualte_distance_rssi(beacon_split[4],beacon_split[5]))
+#                wb.save(start_time + '.xlsx')
+                conn.db.close()
+#        print
+#    else:
+#        break
 
