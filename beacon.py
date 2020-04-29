@@ -127,7 +127,8 @@ while True:
             beacon_split = beacon.split(',')
             # [0] MAC, [1] UUID, [2] Major, [3] Minor, [4] RSSI, [5] Tx power
 #            if beacon_split[2] in ["40001"]:
-            if beacon_split[3] in ["30533"]:
+#            if beacon_split[3] in ["30533"]:
+            if beacon_split[3] in ["30533", "30530"]:
                 conn.creat_connet()
 #                sheet1.append([beacon_split[0], beacon_split[2], beacon_split[3], beacon_split[5], beacon_split[4], conn.calcualte_distance_rssi(beacon_split[4],beacon_split[5]), time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))])
                 conn.insert_unique_data(beacon_split[0], beacon_split[1], beacon_split[2], beacon_split[3])
