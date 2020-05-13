@@ -32,10 +32,10 @@ import argparse
 ##########################################
 class DB_sending:
     def __init__(self):
-        self.url = "210.115.227.108"
-        self.id = 'cic'
-        self.password = '20180903in'
-        self.dbName = 'kindergartenbus'
+        self.url = ""
+        self.id = ''
+        self.password = ''
+        self.dbName = ''
 
     def creat_connet(self):
         self.db = pymysql.connect(host=self.url, port=3306, user=self.id, passwd=self.password, db=self.dbName, charset='utf8')
